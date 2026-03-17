@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DeutschLern">
+<meta name="theme-color" content="#1a1a2e">
+<title>DeutschLern - Almanca Öğren</title>
+<link rel="manifest" href="manifest.json">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+
+:root {
+  --bg: #1a1a2e;
+  --bg-light: #16213e;
+  --surface: #0f3460;
+  --surface-light: #1a4a7a;
+  --card: #1e3a5f;
+  --card-hover: #254a73;
+  --text: #f0f0f0;
+  --text-sec: #a0b4cc;
+  --text-dim: #607590;
+  --accent: #e94560;
+  --accent-glow: rgba(233, 69, 96, 0.3);
+  --green: #4ade80;
+  --green-bg: rgba(74, 222, 128, 0.15);
+  --green-glow: rgba(74, 222, 128, 0.3);
+  --yellow: #fbbf24;
+  --yellow-bg: rgba(251, 191, 36, 0.15);
+  --orange: #fb923c;
+  --red: #f87171;
+  --red-bg: rgba(248, 113, 113, 0.15);
+  --blue: #60a5fa;
+  --blue-bg: rgba(96, 165, 250, 0.15);
+  --purple: #a78bfa;
+  --radius: 16px;
+  --radius-sm: 12px;
+  --radius-xs: 8px;
+  --safe-top: env(safe-area-inset-top, 20px);
+  --safe-bottom: env(safe-area-inset-bottom, 20px);
+  --shadow: 0 4px 24px rgba(0,0,0,0.3);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+/* ═══ Screens ═══ */
+.screen { display: none; min-height: 100dvh; }
+.screen.active { display: block; }
+
+/* ═══ Home Screen ═══ */
+.home-header {
+  padding: calc(var(--safe-top) + 16px) 20px 20px;
+  text-align: center;
+  background: linear-gradient(135deg, var(--bg-light) 0%, var(--surface) 100%);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.home-header h1 {
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, var(--accent), var(--orange));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.home-header .subtitle {
+  font-size: 14px;
+  color: var(--text-sec);
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+/* Stats bar */
+.stats-bar {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  padding: 16px 20px;
+  background: var(--bg-light);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--yellow);
+}
+
+.stat-label {
+  font-size: 11px;
+  color: var(--text-dim);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Level card */
+.level-section {
+  padding: 20px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.level-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--accent);
+  color: white;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 800;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 12px var(--accent-glow);
+}
+
+.level-badge.locked {
+  background: var(--text-dim);
+  box-shadow: none;
+}
+
+/* Unit cards */
+.unit-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+.unit-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 60px;
+  height: 60px;
+  background: radial-gradient(circle at top right, rgba(255,255,255,0.05), transparent);
+  border-radius: 0 0 0 60px;
+}
+
+.unit-card:hover { background: var(--card-hover); }
+.unit-card:active { transform: scale(0.98); }
+.unit-card.completed { border-color: var(--green); }
+.unit-card.current { border-color: var(--accent); box-shadow: 0 0 20px var(--accent-glow); }
+.unit-card.locked { opacity: 0.5; cursor: not-allowed; }
+
+.unit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.unit-title {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.unit-icon {
+  font-size: 24px;
+}
+
+.unit-desc {
+  font-size: 13px;
+  color: var(--text-sec);
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.unit-progress {
+  height: 6px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.unit-progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--green), var(--blue));
+  transition: width 0.5s ease;
+}
+
+.unit-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--text-dim);
+  font-weight: 700;
+}
+
+/* Exam card */
+.exam-card {
+  background: linear-gradient(135deg, var(--accent), #c0392b);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-top: 16px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+  box-shadow: 0 4px 20px var(--accent-glow);
+}
+
+.exam-card:hover { transform: translateY(-2px); }
+.exam-card:active { transform: scale(0.98); }
+.exam-card.locked { background: linear-gradient(135deg, #444, #333); box-shadow: none; cursor: not-allowed; }
+.exam-card.passed { background: linear-gradient(135deg, var(--green), #16a34a); box-shadow: 0 4px 20px var(--green-glow); }
+
+.exam-card h3 { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
+.exam-card p { font-size: 13px; opacity: 0.9; font-weight: 600; }
+
+/* ═══ Quiz Screen ═══ */
+.quiz-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--bg-light);
+  padding: calc(var(--safe-top) + 12px) 20px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.quiz-top-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.quiz-close {
+  background: none;
+  border: none;
+  color: var(--text-sec);
+  font-size: 24px;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+}
+
+.quiz-progress-bar {
+  flex: 1;
+  height: 10px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.quiz-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--orange));
+  border-radius: 5px;
+  transition: width 0.4s ease;
+}
+
+.quiz-score {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--yellow);
+  min-width: 40px;
+  text-align: right;
+}
+
+.quiz-body {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 24px 20px calc(var(--safe-bottom) + 100px);
+}
+
+/* Question type badge */
+.q-type-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 16px;
+}
+
+.q-type-badge.vocab { background: var(--blue-bg); color: var(--blue); }
+.q-type-badge.reverse { background: var(--yellow-bg); color: var(--yellow); }
+.q-type-badge.fill { background: var(--green-bg); color: var(--green); }
+.q-type-badge.dialog { background: var(--red-bg); color: var(--accent); }
+
+/* Question text */
+.question-text {
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+
+.question-hint {
+  font-size: 14px;
+  color: var(--text-sec);
+  font-weight: 600;
+  margin-bottom: 24px;
+}
+
+.question-context {
+  background: var(--card);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  margin-bottom: 20px;
+  font-size: 16px;
+  line-height: 1.6;
+  font-weight: 600;
+  border-left: 3px solid var(--accent);
+}
+
+.blank-word {
+  display: inline-block;
+  min-width: 80px;
+  border-bottom: 3px dashed var(--accent);
+  color: var(--accent);
+  font-weight: 800;
+  padding: 0 4px;
+  text-align: center;
+}
+
+/* Answer options */
+.options-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.option-btn {
+  background: var(--card);
+  border: 2px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius-sm);
+  padding: 16px 18px;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+  position: relative;
+}
+
+.option-btn:hover { background: var(--card-hover); border-color: rgba(255,255,255,0.15); }
+.option-btn:active { transform: scale(0.98); }
+
+.option-btn.correct {
+  background: var(--green-bg) !important;
+  border-color: var(--green) !important;
+  color: var(--green) !important;
+  animation: correctPop 0.4s ease;
+}
+
+.option-btn.wrong {
+  background: var(--red-bg) !important;
+  border-color: var(--red) !important;
+  color: var(--red) !important;
+  animation: shake 0.4s ease;
+}
+
+.option-btn.disabled { pointer-events: none; opacity: 0.6; }
+.option-btn.correct.disabled, .option-btn.wrong.disabled { opacity: 1; }
+
+@keyframes correctPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
+}
+
+/* Feedback area */
+.feedback-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px 20px calc(var(--safe-bottom) + 16px);
+  z-index: 50;
+  display: none;
+}
+
+.feedback-bar.visible { display: block; animation: slideUp 0.3s ease; }
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.feedback-content {
+  max-width: 500px;
+  margin: 0 auto;
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.feedback-content.correct {
+  background: #166534;
+  border: 1px solid var(--green);
+}
+
+.feedback-content.wrong {
+  background: #7f1d1d;
+  border: 1px solid var(--red);
+}
+
+.feedback-text {
+  font-weight: 800;
+  font-size: 15px;
+}
+
+.feedback-detail {
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0.9;
+  margin-top: 2px;
+}
+
+.feedback-next {
+  background: white;
+  color: #1a1a2e;
+  border: none;
+  border-radius: var(--radius-xs);
+  padding: 12px 24px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+
+.feedback-next:active { transform: scale(0.95); }
+
+/* ═══ Result Screen ═══ */
+.result-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.result-emoji { font-size: 72px; margin-bottom: 16px; }
+
+.result-title {
+  font-size: 28px;
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+
+.result-score {
+  font-size: 48px;
+  font-weight: 900;
+  margin: 16px 0;
+}
+
+.result-score.pass { color: var(--green); }
+.result-score.fail { color: var(--red); }
+
+.result-detail {
+  font-size: 16px;
+  color: var(--text-sec);
+  font-weight: 600;
+  margin-bottom: 32px;
+}
+
+.result-btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 16px 48px;
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 16px var(--accent-glow);
+  transition: all 0.2s;
+  margin-bottom: 12px;
+}
+
+.result-btn:active { transform: scale(0.96); }
+
+.result-btn.secondary {
+  background: var(--card);
+  box-shadow: none;
+}
+
+/* ═══ Scrollbar ═══ */
+::-webkit-scrollbar { width: 0; }
+
+/* ═══ Responsive ═══ */
+@media (min-width: 600px) {
+  .question-text { font-size: 26px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ HOME SCREEN ═══ -->
+<div class="screen active" id="homeScreen">
+  <div class="home-header">
+    <h1>🇩🇪 DeutschLern</h1>
+    <div class="subtitle">Almanca Öğrenmeye Başla</div>
+  </div>
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-value" id="statWords">0</div>
+      <div class="stat-label">Kelime</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" id="statStreak">0</div>
+      <div class="stat-label">Seri 🔥</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" id="statAccuracy">0%</div>
+      <div class="stat-label">Başarı</div>
+    </div>
+  </div>
+  <div class="level-section" id="levelSection"></div>
+</div>
+
+<!-- ═══ QUIZ SCREEN ═══ -->
+<div class="screen" id="quizScreen">
+  <div class="quiz-header">
+    <div class="quiz-top-row">
+      <button class="quiz-close" onclick="exitQuiz()">✕</button>
+      <div class="quiz-progress-bar">
+        <div class="quiz-progress-fill" id="quizProgressFill"></div>
+      </div>
+      <div class="quiz-score" id="quizScore">0</div>
+    </div>
+  </div>
+  <div class="quiz-body" id="quizBody"></div>
+  <div class="feedback-bar" id="feedbackBar">
+    <div class="feedback-content" id="feedbackContent">
+      <div>
+        <div class="feedback-text" id="feedbackText"></div>
+        <div class="feedback-detail" id="feedbackDetail"></div>
+      </div>
+      <button class="feedback-next" onclick="nextQuestion()">Devam</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ RESULT SCREEN ═══ -->
+<div class="screen" id="resultScreen">
+  <div class="result-screen" id="resultContent"></div>
+</div>
+
+<script>
+// ══════════════════════════════════════
+// WORD DATABASE - A1 LEVEL
+// ══════════════════════════════════════
+const A1_DATA = {
+  units: [
+    {
+      id: 'a1_u1',
+      title: 'Karşılaşma & Selamlaşma',
+      icon: '👋',
+      desc: 'Temel selamlaşma ve tanışma kalıpları',
+      words: [
+        { de: 'Hallo', tr: 'Merhaba' },
+        { de: 'Guten Morgen', tr: 'Günaydın' },
+        { de: 'Guten Tag', tr: 'İyi günler' },
+        { de: 'Guten Abend', tr: 'İyi akşamlar' },
+        { de: 'Tschüss', tr: 'Hoşça kal' },
+        { de: 'Auf Wiedersehen', tr: 'Güle güle' },
+        { de: 'Danke', tr: 'Teşekkürler' },
+        { de: 'Bitte', tr: 'Rica ederim / Lütfen' },
+        { de: 'Ja', tr: 'Evet' },
+        { de: 'Nein', tr: 'Hayır' },
+        { de: 'Entschuldigung', tr: 'Özür dilerim / Pardon' },
+        { de: 'Wie heißen Sie?', tr: 'Adınız ne? (resmi)' },
+        { de: 'Ich heiße...', tr: 'Benim adım...' },
+        { de: 'Wie geht es Ihnen?', tr: 'Nasılsınız? (resmi)' },
+        { de: 'Gut', tr: 'İyi' },
+        { de: 'Schlecht', tr: 'Kötü' },
+        { de: 'Freut mich', tr: 'Memnun oldum' },
+        { de: 'Willkommen', tr: 'Hoş geldiniz' },
+      ],
+      fillSentences: [
+        { sentence: '___ Morgen! Wie geht es Ihnen?', answer: 'Guten', options: ['Guten', 'Gute', 'Auf', 'Wie'], tr: 'Günaydın! Nasılsınız?' },
+        { sentence: 'Ich ___ Maria.', answer: 'heiße', options: ['heiße', 'bin', 'habe', 'gehe'], tr: 'Benim adım Maria.' },
+        { sentence: 'Wie ___ es Ihnen?', answer: 'geht', options: ['geht', 'heißt', 'ist', 'hat'], tr: 'Nasılsınız?' },
+        { sentence: '___, mir geht es gut.', answer: 'Danke', options: ['Danke', 'Bitte', 'Hallo', 'Nein'], tr: 'Teşekkürler, iyiyim.' },
+      ],
+      dialogs: [
+        { context: 'Birisiyle ilk kez tanışıyorsun. O sana "Wie heißen Sie?" diye soruyor.', correctAnswer: 'Ich heiße Fatih. Freut mich!', options: ['Ich heiße Fatih. Freut mich!', 'Tschüss, bis morgen!', 'Guten Abend!', 'Nein, danke.'], tr: 'Benim adım Fatih. Memnun oldum!' },
+        { context: 'Sabah iş yerine geldin. Meslektaşına ne dersin?', correctAnswer: 'Guten Morgen! Wie geht es Ihnen?', options: ['Guten Morgen! Wie geht es Ihnen?', 'Auf Wiedersehen!', 'Schlecht, danke.', 'Ich heiße Morgen.'], tr: 'Günaydın! Nasılsınız?' },
+        { context: 'Biri sana "Danke schön!" dedi. Ne cevap verirsin?', correctAnswer: 'Bitte schön!', options: ['Bitte schön!', 'Guten Tag!', 'Entschuldigung!', 'Tschüss!'], tr: 'Rica ederim!' },
+      ]
+    },
+    {
+      id: 'a1_u2',
+      title: 'Sayılar & Renkler',
+      icon: '🔢',
+      desc: 'Sayılar (1-20) ve temel renkler',
+      words: [
+        { de: 'eins', tr: 'bir (1)' },
+        { de: 'zwei', tr: 'iki (2)' },
+        { de: 'drei', tr: 'üç (3)' },
+        { de: 'vier', tr: 'dört (4)' },
+        { de: 'fünf', tr: 'beş (5)' },
+        { de: 'sechs', tr: 'altı (6)' },
+        { de: 'sieben', tr: 'yedi (7)' },
+        { de: 'acht', tr: 'sekiz (8)' },
+        { de: 'neun', tr: 'dokuz (9)' },
+        { de: 'zehn', tr: 'on (10)' },
+        { de: 'rot', tr: 'kırmızı' },
+        { de: 'blau', tr: 'mavi' },
+        { de: 'grün', tr: 'yeşil' },
+        { de: 'gelb', tr: 'sarı' },
+        { de: 'schwarz', tr: 'siyah' },
+        { de: 'weiß', tr: 'beyaz' },
+        { de: 'braun', tr: 'kahverengi' },
+        { de: 'grau', tr: 'gri' },
+      ],
+      fillSentences: [
+        { sentence: 'Die Banane ist ___.', answer: 'gelb', options: ['gelb', 'blau', 'rot', 'grün'], tr: 'Muz sarıdır.' },
+        { sentence: 'Ich habe ___ Katzen. (3)', answer: 'drei', options: ['drei', 'zwei', 'fünf', 'eins'], tr: '3 kedim var.' },
+        { sentence: 'Der Himmel ist ___.', answer: 'blau', options: ['blau', 'rot', 'gelb', 'braun'], tr: 'Gökyüzü mavidir.' },
+        { sentence: 'Eins, zwei, ___, vier, fünf.', answer: 'drei', options: ['drei', 'sechs', 'acht', 'zehn'], tr: 'Bir, iki, üç, dört, beş.' },
+      ],
+      dialogs: [
+        { context: 'Markette kasiyere elma sayısını söylüyorsun. 5 elman var.', correctAnswer: 'Fünf Äpfel, bitte.', options: ['Fünf Äpfel, bitte.', 'Drei Äpfel, bitte.', 'Zehn Äpfel, bitte.', 'Eins Äpfel, bitte.'], tr: 'Beş elma, lütfen.' },
+        { context: 'Biri sana "Welche Farbe hat die Tomate?" (Domatesin rengi ne?) diye soruyor.', correctAnswer: 'Die Tomate ist rot.', options: ['Die Tomate ist rot.', 'Die Tomate ist blau.', 'Die Tomate ist grün.', 'Die Tomate ist gelb.'], tr: 'Domates kırmızıdır.' },
+      ]
+    },
+    {
+      id: 'a1_u3',
+      title: 'Aile & İnsanlar',
+      icon: '👨‍👩‍👧‍👦',
+      desc: 'Aile üyeleri ve kişi tanımları',
+      words: [
+        { de: 'die Mutter', tr: 'anne' },
+        { de: 'der Vater', tr: 'baba' },
+        { de: 'die Schwester', tr: 'kız kardeş' },
+        { de: 'der Bruder', tr: 'erkek kardeş' },
+        { de: 'die Tochter', tr: 'kız çocuk (evlat)' },
+        { de: 'der Sohn', tr: 'oğul' },
+        { de: 'die Großmutter', tr: 'büyükanne' },
+        { de: 'der Großvater', tr: 'büyükbaba' },
+        { de: 'das Kind', tr: 'çocuk' },
+        { de: 'die Frau', tr: 'kadın / eş' },
+        { de: 'der Mann', tr: 'erkek / koca' },
+        { de: 'der Freund', tr: 'arkadaş (erkek)' },
+        { de: 'die Freundin', tr: 'arkadaş (kadın)' },
+        { de: 'die Familie', tr: 'aile' },
+        { de: 'die Eltern', tr: 'anne-baba' },
+        { de: 'das Baby', tr: 'bebek' },
+      ],
+      fillSentences: [
+        { sentence: 'Meine ___ heißt Anna.', answer: 'Mutter', options: ['Mutter', 'Vater', 'Bruder', 'Sohn'], tr: 'Annemin adı Anna.' },
+        { sentence: 'Ich habe einen ___ und eine Schwester.', answer: 'Bruder', options: ['Bruder', 'Mutter', 'Kind', 'Frau'], tr: 'Bir erkek kardeşim ve bir kız kardeşim var.' },
+        { sentence: 'Die ___ sind im Garten.', answer: 'Kinder', options: ['Kinder', 'Mutter', 'Vater', 'Frau'], tr: 'Çocuklar bahçede.' },
+        { sentence: 'Mein ___ ist 70 Jahre alt.', answer: 'Großvater', options: ['Großvater', 'Bruder', 'Sohn', 'Baby'], tr: 'Büyükbabam 70 yaşında.' },
+      ],
+      dialogs: [
+        { context: 'Biri sana aileni soruyor: "Haben Sie Geschwister?" (Kardeşiniz var mı?)', correctAnswer: 'Ja, ich habe einen Bruder.', options: ['Ja, ich habe einen Bruder.', 'Mein Vater heißt Hans.', 'Die Familie ist groß.', 'Nein, das ist meine Mutter.'], tr: 'Evet, bir erkek kardeşim var.' },
+        { context: 'Fotoğraftaki kişiyi tanıtıyorsun: "Wer ist das?" (Bu kim?)', correctAnswer: 'Das ist meine Großmutter.', options: ['Das ist meine Großmutter.', 'Ich heiße Thomas.', 'Er hat zwei Kinder.', 'Die Farbe ist rot.'], tr: 'Bu benim büyükannem.' },
+      ]
+    },
+    {
+      id: 'a1_u4',
+      title: 'Yiyecek & İçecek',
+      icon: '🍎',
+      desc: 'Temel yiyecek, içecek ve restoran kalıpları',
+      words: [
+        { de: 'das Brot', tr: 'ekmek' },
+        { de: 'das Wasser', tr: 'su' },
+        { de: 'der Kaffee', tr: 'kahve' },
+        { de: 'der Tee', tr: 'çay' },
+        { de: 'die Milch', tr: 'süt' },
+        { de: 'der Apfel', tr: 'elma' },
+        { de: 'die Suppe', tr: 'çorba' },
+        { de: 'das Fleisch', tr: 'et' },
+        { de: 'der Reis', tr: 'pilav' },
+        { de: 'der Käse', tr: 'peynir' },
+        { de: 'das Ei', tr: 'yumurta' },
+        { de: 'der Zucker', tr: 'şeker' },
+        { de: 'das Frühstück', tr: 'kahvaltı' },
+        { de: 'das Mittagessen', tr: 'öğle yemeği' },
+        { de: 'das Abendessen', tr: 'akşam yemeği' },
+        { de: 'lecker', tr: 'lezzetli' },
+        { de: 'hungrig', tr: 'aç' },
+        { de: 'durstig', tr: 'susuz' },
+      ],
+      fillSentences: [
+        { sentence: 'Ich trinke gern ___.', answer: 'Kaffee', options: ['Kaffee', 'Brot', 'Fleisch', 'Reis'], tr: 'Kahve içmeyi severim.' },
+        { sentence: 'Zum ___ esse ich Brot und Käse.', answer: 'Frühstück', options: ['Frühstück', 'Wasser', 'Apfel', 'Zucker'], tr: 'Kahvaltıda ekmek ve peynir yerim.' },
+        { sentence: 'Ich bin ___. Ich möchte Wasser.', answer: 'durstig', options: ['durstig', 'hungrig', 'lecker', 'gut'], tr: 'Susuzum. Su istiyorum.' },
+        { sentence: 'Die Suppe ist sehr ___.', answer: 'lecker', options: ['lecker', 'durstig', 'hungrig', 'blau'], tr: 'Çorba çok lezzetli.' },
+      ],
+      dialogs: [
+        { context: 'Restoranda garson "Was möchten Sie trinken?" (Ne içmek istersiniz?) diye soruyor.', correctAnswer: 'Einen Kaffee, bitte.', options: ['Einen Kaffee, bitte.', 'Ich bin hungrig.', 'Das Brot ist lecker.', 'Guten Morgen!'], tr: 'Bir kahve, lütfen.' },
+        { context: 'Arkadaşın soruyor: "Was isst du zum Frühstück?" (Kahvaltıda ne yersin?)', correctAnswer: 'Ich esse Brot, Käse und Ei.', options: ['Ich esse Brot, Käse und Ei.', 'Ich trinke Suppe zum Abendessen.', 'Der Apfel ist rot.', 'Ich habe eine Schwester.'], tr: 'Ekmek, peynir ve yumurta yerim.' },
+      ]
+    },
+    {
+      id: 'a1_u5',
+      title: 'Günlük Hayat & Fiiller',
+      icon: '🏠',
+      desc: 'Temel fiiller ve günlük rutinler',
+      words: [
+        { de: 'gehen', tr: 'gitmek' },
+        { de: 'kommen', tr: 'gelmek' },
+        { de: 'machen', tr: 'yapmak' },
+        { de: 'haben', tr: 'sahip olmak' },
+        { de: 'sein', tr: 'olmak' },
+        { de: 'essen', tr: 'yemek (fiil)' },
+        { de: 'trinken', tr: 'içmek' },
+        { de: 'schlafen', tr: 'uyumak' },
+        { de: 'arbeiten', tr: 'çalışmak' },
+        { de: 'lernen', tr: 'öğrenmek' },
+        { de: 'sprechen', tr: 'konuşmak' },
+        { de: 'wohnen', tr: 'oturmak / yaşamak' },
+        { de: 'kaufen', tr: 'satın almak' },
+        { de: 'spielen', tr: 'oynamak' },
+        { de: 'lesen', tr: 'okumak' },
+        { de: 'schreiben', tr: 'yazmak' },
+        { de: 'heute', tr: 'bugün' },
+        { de: 'morgen', tr: 'yarın' },
+      ],
+      fillSentences: [
+        { sentence: 'Ich ___ in Berlin.', answer: 'wohne', options: ['wohne', 'esse', 'trinke', 'schlafe'], tr: 'Berlin\'de yaşıyorum.' },
+        { sentence: 'Er ___ Deutsch in der Schule.', answer: 'lernt', options: ['lernt', 'schläft', 'kauft', 'trinkt'], tr: 'O okulda Almanca öğreniyor.' },
+        { sentence: 'Wir ___ heute ins Kino.', answer: 'gehen', options: ['gehen', 'essen', 'schlafen', 'lesen'], tr: 'Bugün sinemaya gidiyoruz.' },
+        { sentence: 'Sie ___ ein Buch.', answer: 'liest', options: ['liest', 'spricht', 'kauft', 'macht'], tr: 'O bir kitap okuyor.' },
+      ],
+      dialogs: [
+        { context: 'Biri soruyor: "Was machen Sie heute?" (Bugün ne yapıyorsunuz?)', correctAnswer: 'Ich arbeite und dann lerne ich Deutsch.', options: ['Ich arbeite und dann lerne ich Deutsch.', 'Ich wohne in Berlin.', 'Guten Abend!', 'Das Essen ist lecker.'], tr: 'Çalışıyorum, sonra Almanca öğreniyorum.' },
+        { context: 'Arkadaşın "Wo wohnst du?" (Nerede yaşıyorsun?) diye soruyor.', correctAnswer: 'Ich wohne in der Türkei, in Kayseri.', options: ['Ich wohne in der Türkei, in Kayseri.', 'Ich kaufe Brot.', 'Morgen gehe ich schlafen.', 'Ich spreche drei.'], tr: 'Türkiye\'de, Kayseri\'de yaşıyorum.' },
+      ]
+    }
+  ],
+  // Level exam: mix of all units
+  examQuestionCount: 20,
+  examPassRate: 0.8
+};
+
+// ══════════════════════════════════════
+// STATE MANAGEMENT
+// ══════════════════════════════════════
+const STORAGE_KEY = 'deutschlern_progress';
+
+let progress = {
+  unitProgress: {},  // unitId -> { completed: bool, correctCount, totalCount, wordsLearned: [] }
+  examPassed: false,
+  examScore: 0,
+  totalCorrect: 0,
+  totalAnswered: 0,
+  streak: 0,
+  lastPlayDate: null
+};
+
+let currentQuiz = {
+  unitId: null,
+  isExam: false,
+  questions: [],
+  currentIndex: 0,
+  correctCount: 0
+};
+
+function loadProgress() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) progress = { ...progress, ...JSON.parse(raw) };
+  } catch(e) {}
+  updateStreak();
+}
+
+function saveProgress() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+}
+
+function updateStreak() {
+  const today = new Date().toDateString();
+  if (progress.lastPlayDate !== today) {
+    const yesterday = new Date(Date.now() - 86400000).toDateString();
+    if (progress.lastPlayDate === yesterday) {
+      // Continue streak
+    } else if (progress.lastPlayDate) {
+      progress.streak = 0;
+    }
+  }
+}
+
+function markPlayed() {
+  const today = new Date().toDateString();
+  if (progress.lastPlayDate !== today) {
+    const yesterday = new Date(Date.now() - 86400000).toDateString();
+    if (progress.lastPlayDate !== yesterday && progress.lastPlayDate) {
+      progress.streak = 0;
+    }
+    progress.streak++;
+    progress.lastPlayDate = today;
+  }
+  saveProgress();
+}
+
+// ══════════════════════════════════════
+// QUESTION GENERATION
+// ══════════════════════════════════════
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function pickRandom(arr, n) {
+  return shuffle(arr).slice(0, n);
+}
+
+function getAllWords() {
+  const words = [];
+  A1_DATA.units.forEach(u => words.push(...u.words));
+  return words;
+}
+
+function generateWrongOptions(correct, allOptions, field, count = 3) {
+  const filtered = allOptions.filter(w => w[field] !== correct);
+  return pickRandom(filtered, count).map(w => w[field]);
+}
+
+function generateUnitQuestions(unit) {
+  const questions = [];
+  const allWords = getAllWords();
+  
+  // Type 1: DE -> TR (6 questions)
+  const deToTr = pickRandom(unit.words, Math.min(6, unit.words.length));
+  deToTr.forEach(w => {
+    const wrongs = generateWrongOptions(w.tr, allWords, 'tr');
+    questions.push({
+      type: 'vocab',
+      typeName: 'Kelime',
+      question: w.de,
+      hint: 'Türkçe karşılığını seç',
+      correctAnswer: w.tr,
+      options: shuffle([w.tr, ...wrongs]),
+      translation: `${w.de} = ${w.tr}`
+    });
+  });
+  
+  // Type 2: TR -> DE (4 questions)
+  const trToDe = pickRandom(unit.words, Math.min(4, unit.words.length));
+  trToDe.forEach(w => {
+    const wrongs = generateWrongOptions(w.de, allWords, 'de');
+    questions.push({
+      type: 'reverse',
+      typeName: 'Çeviri',
+      question: w.tr,
+      hint: 'Almanca karşılığını seç',
+      correctAnswer: w.de,
+      options: shuffle([w.de, ...wrongs]),
+      translation: `${w.tr} = ${w.de}`
+    });
+  });
+  
+  // Type 3: Fill in blank
+  unit.fillSentences.forEach(fs => {
+    questions.push({
+      type: 'fill',
+      typeName: 'Boşluk',
+      sentence: fs.sentence,
+      hint: fs.tr,
+      correctAnswer: fs.answer,
+      options: shuffle(fs.options),
+      translation: fs.tr
+    });
+  });
+  
+  // Type 4: Dialog
+  unit.dialogs.forEach(d => {
+    questions.push({
+      type: 'dialog',
+      typeName: 'Diyalog',
+      context: d.context,
+      hint: 'En uygun cevabı seç',
+      correctAnswer: d.correctAnswer,
+      options: shuffle(d.options),
+      translation: d.tr
+    });
+  });
+  
+  return shuffle(questions);
+}
+
+function generateExamQuestions() {
+  const questions = [];
+  const allWords = getAllWords();
+  
+  // Pick from all units
+  A1_DATA.units.forEach(unit => {
+    // 2 vocab per unit
+    const vocabWords = pickRandom(unit.words, 2);
+    vocabWords.forEach(w => {
+      const wrongs = generateWrongOptions(w.tr, allWords, 'tr');
+      questions.push({
+        type: 'vocab',
+        typeName: 'Kelime',
+        question: w.de,
+        hint: 'Türkçe karşılığını seç',
+        correctAnswer: w.tr,
+        options: shuffle([w.tr, ...wrongs]),
+        translation: `${w.de} = ${w.tr}`
+      });
+    });
+    
+    // 1 fill per unit
+    if (unit.fillSentences.length > 0) {
+      const fs = pickRandom(unit.fillSentences, 1)[0];
+      questions.push({
+        type: 'fill',
+        typeName: 'Boşluk',
+        sentence: fs.sentence,
+        hint: fs.tr,
+        correctAnswer: fs.answer,
+        options: shuffle(fs.options),
+        translation: fs.tr
+      });
+    }
+    
+    // 1 dialog per unit
+    if (unit.dialogs.length > 0) {
+      const d = pickRandom(unit.dialogs, 1)[0];
+      questions.push({
+        type: 'dialog',
+        typeName: 'Diyalog',
+        context: d.context,
+        hint: 'En uygun cevabı seç',
+        correctAnswer: d.correctAnswer,
+        options: shuffle(d.options),
+        translation: d.tr
+      });
+    }
+  });
+  
+  return shuffle(questions).slice(0, A1_DATA.examQuestionCount);
+}
+
+// ══════════════════════════════════════
+// RENDERING - HOME
+// ══════════════════════════════════════
+function renderHome() {
+  // Stats
+  const totalWords = getAllWords().length;
+  const learnedWords = new Set();
+  Object.values(progress.unitProgress).forEach(up => {
+    if (up.wordsLearned) up.wordsLearned.forEach(w => learnedWords.add(w));
+  });
+  
+  document.getElementById('statWords').textContent = learnedWords.size;
+  document.getElementById('statStreak').textContent = progress.streak;
+  const accuracy = progress.totalAnswered > 0 
+    ? Math.round(progress.totalCorrect / progress.totalAnswered * 100) 
+    : 0;
+  document.getElementById('statAccuracy').textContent = accuracy + '%';
+  
+  // Units
+  const section = document.getElementById('levelSection');
+  let html = '<div class="level-badge">A1 Seviye</div>';
+  
+  const units = A1_DATA.units;
+  let allCompleted = true;
+  
+  units.forEach((unit, idx) => {
+    const up = progress.unitProgress[unit.id] || { completed: false, correctCount: 0, totalCount: 0 };
+    const prevCompleted = idx === 0 || (progress.unitProgress[units[idx-1].id] || {}).completed;
+    const isLocked = !prevCompleted;
+    const isCurrent = prevCompleted && !up.completed;
+    
+    if (!up.completed) allCompleted = false;
+    
+    const progressPct = up.totalCount > 0 ? Math.round(up.correctCount / up.totalCount * 100) : 0;
+    
+    let cardClass = 'unit-card';
+    if (up.completed) cardClass += ' completed';
+    else if (isCurrent) cardClass += ' current';
+    else if (isLocked) cardClass += ' locked';
+    
+    html += `
+      <div class="${cardClass}" onclick="${isLocked ? '' : `startUnit('${unit.id}')`}">
+        <div class="unit-header">
+          <div class="unit-title">${unit.title}</div>
+          <div class="unit-icon">${unit.icon}</div>
+        </div>
+        <div class="unit-desc">${unit.desc}</div>
+        <div class="unit-progress">
+          <div class="unit-progress-fill" style="width: ${up.completed ? 100 : progressPct}%"></div>
+        </div>
+        <div class="unit-status">
+          <span>${isLocked ? '🔒 Kilitli' : up.completed ? '✅ Tamamlandı' : '📖 ' + progressPct + '% ilerleme'}</span>
+          <span>${unit.words.length} kelime</span>
+        </div>
+      </div>
+    `;
+  });
+  
+  // Exam card
+  const allUnitsCompleted = units.every(u => (progress.unitProgress[u.id] || {}).completed);
+  let examClass = 'exam-card';
+  let examContent = '';
+  
+  if (progress.examPassed) {
+    examClass += ' passed';
+    examContent = `<h3>✅ A1 Sınavı - Geçtiniz!</h3><p>Skor: %${progress.examScore} — A2 seviyesi yakında!</p>`;
+  } else if (allUnitsCompleted) {
+    examContent = `<h3>🏆 A1 Seviye Sınavı</h3><p>Tüm üniteleri tamamladın! Sınava gir ve A1'i bitir.</p>`;
+  } else {
+    examClass += ' locked';
+    examContent = `<h3>🔒 A1 Seviye Sınavı</h3><p>Tüm üniteleri tamamlayınca açılır</p>`;
+  }
+  
+  html += `<div class="${examClass}" onclick="${allUnitsCompleted && !progress.examPassed ? 'startExam()' : ''}">${examContent}</div>`;
+  
+  section.innerHTML = html;
+}
+
+// ══════════════════════════════════════
+// RENDERING - QUIZ
+// ══════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function startUnit(unitId) {
+  const unit = A1_DATA.units.find(u => u.id === unitId);
+  if (!unit) return;
+  
+  currentQuiz = {
+    unitId,
+    isExam: false,
+    questions: generateUnitQuestions(unit),
+    currentIndex: 0,
+    correctCount: 0
+  };
+  
+  showScreen('quizScreen');
+  renderQuestion();
+}
+
+function startExam() {
+  currentQuiz = {
+    unitId: null,
+    isExam: true,
+    questions: generateExamQuestions(),
+    currentIndex: 0,
+    correctCount: 0
+  };
+  
+  showScreen('quizScreen');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = currentQuiz.questions[currentQuiz.currentIndex];
+  if (!q) return showResults();
+  
+  const total = currentQuiz.questions.length;
+  const pct = (currentQuiz.currentIndex / total) * 100;
+  
+  document.getElementById('quizProgressFill').style.width = pct + '%';
+  document.getElementById('quizScore').textContent = currentQuiz.correctCount;
+  document.getElementById('feedbackBar').classList.remove('visible');
+  
+  const body = document.getElementById('quizBody');
+  let html = '';
+  
+  // Type badge
+  const typeClass = q.type;
+  html += `<span class="q-type-badge ${typeClass}">${q.typeName}</span>`;
+  
+  if (q.type === 'vocab' || q.type === 'reverse') {
+    html += `<div class="question-text">${q.question}</div>`;
+    html += `<div class="question-hint">${q.hint}</div>`;
+  } else if (q.type === 'fill') {
+    const displaySentence = q.sentence.replace('___', '<span class="blank-word">???</span>');
+    html += `<div class="question-text" style="font-size:18px">${displaySentence}</div>`;
+    html += `<div class="question-hint">${q.hint}</div>`;
+  } else if (q.type === 'dialog') {
+    html += `<div class="question-context">${q.context}</div>`;
+    html += `<div class="question-hint">${q.hint}</div>`;
+  }
+  
+  // Options
+  html += '<div class="options-grid">';
+  q.options.forEach((opt, i) => {
+    html += `<button class="option-btn" onclick="selectAnswer(this, '${escapeStr(opt)}', '${escapeStr(q.correctAnswer)}')">${opt}</button>`;
+  });
+  html += '</div>';
+  
+  body.innerHTML = html;
+}
+
+function escapeStr(s) {
+  return s.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+}
+
+function selectAnswer(btn, selected, correct) {
+  const buttons = document.querySelectorAll('.option-btn');
+  buttons.forEach(b => b.classList.add('disabled'));
+  
+  const isCorrect = selected === correct;
+  const q = currentQuiz.questions[currentQuiz.currentIndex];
+  
+  if (isCorrect) {
+    btn.classList.add('correct');
+    currentQuiz.correctCount++;
+    progress.totalCorrect++;
+  } else {
+    btn.classList.add('wrong');
+    // Highlight correct
+    buttons.forEach(b => {
+      if (b.textContent === correct) b.classList.add('correct');
+    });
+  }
+  
+  progress.totalAnswered++;
+  markPlayed();
+  
+  // Show feedback
+  const fb = document.getElementById('feedbackBar');
+  const fc = document.getElementById('feedbackContent');
+  const ft = document.getElementById('feedbackText');
+  const fd = document.getElementById('feedbackDetail');
+  
+  fc.className = 'feedback-content ' + (isCorrect ? 'correct' : 'wrong');
+  ft.textContent = isCorrect ? 'Doğru! 🎉' : 'Yanlış 😔';
+  fd.textContent = q.translation || '';
+  fb.classList.add('visible');
+}
+
+function nextQuestion() {
+  currentQuiz.currentIndex++;
+  if (currentQuiz.currentIndex >= currentQuiz.questions.length) {
+    showResults();
+  } else {
+    renderQuestion();
+  }
+}
+
+function exitQuiz() {
+  showScreen('homeScreen');
+  renderHome();
+}
+
+// ══════════════════════════════════════
+// RESULTS
+// ══════════════════════════════════════
+function showResults() {
+  document.getElementById('feedbackBar').classList.remove('visible');
+  
+  const total = currentQuiz.questions.length;
+  const correct = currentQuiz.correctCount;
+  const pct = Math.round(correct / total * 100);
+  
+  if (currentQuiz.isExam) {
+    const passed = pct >= A1_DATA.examPassRate * 100;
+    if (passed) {
+      progress.examPassed = true;
+      progress.examScore = pct;
+    }
+    saveProgress();
+    
+    const content = document.getElementById('resultContent');
+    content.innerHTML = `
+      <div class="result-emoji">${passed ? '🏆' : '📚'}</div>
+      <div class="result-title">${passed ? 'A1 Sınavını Geçtin!' : 'Biraz Daha Çalışmalısın'}</div>
+      <div class="result-score ${passed ? 'pass' : 'fail'}">%${pct}</div>
+      <div class="result-detail">${correct}/${total} doğru — Geçme notu: %${A1_DATA.examPassRate * 100}</div>
+      <button class="result-btn" onclick="showScreen('homeScreen'); renderHome();">${passed ? 'Tebrikler! Ana Sayfa' : 'Geri Dön'}</button>
+      ${!passed ? '<button class="result-btn secondary" onclick="startExam()">Tekrar Dene</button>' : ''}
+    `;
+  } else {
+    // Unit result
+    const unit = A1_DATA.units.find(u => u.id === currentQuiz.unitId);
+    const passed = pct >= 60;
+    
+    if (!progress.unitProgress[currentQuiz.unitId]) {
+      progress.unitProgress[currentQuiz.unitId] = { completed: false, correctCount: 0, totalCount: 0, wordsLearned: [] };
+    }
+    
+    const up = progress.unitProgress[currentQuiz.unitId];
+    up.correctCount = Math.max(up.correctCount, correct);
+    up.totalCount = Math.max(up.totalCount, total);
+    
+    if (passed) {
+      up.completed = true;
+      up.wordsLearned = unit.words.map(w => w.de);
+    }
+    
+    saveProgress();
+    
+    const content = document.getElementById('resultContent');
+    content.innerHTML = `
+      <div class="result-emoji">${passed ? '⭐' : '💪'}</div>
+      <div class="result-title">${passed ? 'Ünite Tamamlandı!' : 'Tekrar Dene'}</div>
+      <div class="result-score ${passed ? 'pass' : 'fail'}">%${pct}</div>
+      <div class="result-detail">${correct}/${total} doğru${!passed ? ' — %60 gerekli' : ''}</div>
+      ${unit ? `<div class="result-detail" style="margin-top:-20px">${unit.icon} ${unit.title}</div>` : ''}
+      <button class="result-btn" onclick="showScreen('homeScreen'); renderHome();">Ana Sayfa</button>
+      <button class="result-btn secondary" onclick="startUnit('${currentQuiz.unitId}')">Tekrar Çalış</button>
+    `;
+  }
+  
+  showScreen('resultScreen');
+}
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+loadProgress();
+renderHome();
+</script>
+</body>
+</html>
